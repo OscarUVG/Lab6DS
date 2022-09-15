@@ -5,6 +5,7 @@ import string
 import demoji
 import seaborn as sns
 import matplotlib.pyplot as plt
+import numpy as np
 
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -40,11 +41,24 @@ auth = tweepy.OAuth1UserHandler(
 
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
+#mi user, síganme c:
+print(api.verify_credentials().screen_name)
+
+#client = tweepy.Client(bearer_token='AAAAAAAAAAAAAAAAAAAAAOhLhAEAAAAA9IeSL4RY%2FuHnHSfsC1GOrfIqljQ%3DNCeytls2bNK78J4jNfmEmvP2d190xs3gV0FCMs2CAYGRJmeS4j')
+
+#query = 'acoso -is:retweet'
+#tweets = client.search_recent_tweets(query=query, tweet_fields=['context_annotations', 'created_at'], max_results=10)
+
+#char_list = [tweets[j] for j in range(len(tweets)) if ord(tweets[j]) in range(65536)]
+#tweet=''
+#for j in char_list:
+#    tweet=tweet+j
+
 search_query = "#traficogt -filter:retweets"
 
 tweets = tweepy.Cursor(api.search_tweets,
               q=search_query,
-              lang="es").items(300)
+              lang="es").items(200)
 
 #lista
 tweets_copy = []
@@ -216,3 +230,21 @@ top_tweet_trigrams = get_top_tweet_trigrams(tweetsEmojiless[0])[:30]
 x,y=map(list,zip(*top_tweet_trigrams))
 sns.barplot(x=y,y=x, palette="Blues_r").set_title("Trigrama TraficoGT")
 plt.show()
+
+# --- Analisis de sentimientos ---
+from nltk.sentiment import SentimentIntensityAnalyzer
+
+
+# Analisis de sentimientos
+from googletrans import Translator, constants
+from pprint import pprint
+
+translator = Translator()
+translation = translator.translate("Hola Mundo")
+
+tweetsEnglish = ['' for i in range(len(tweetsEmojiless[0]))]
+for k in range(len(tweetsEnglish)):
+    tweetsEnglish[k] = translator.translate(tweetsEmojiless[0][k]).text
+    
+    
+    #falta análisis de sentimientos(?)
