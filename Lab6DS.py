@@ -41,19 +41,6 @@ auth = tweepy.OAuth1UserHandler(
 
 api = tweepy.API(auth, wait_on_rate_limit=True)
 
-#mi user, síganme c:
-print(api.verify_credentials().screen_name)
-
-#client = tweepy.Client(bearer_token='AAAAAAAAAAAAAAAAAAAAAOhLhAEAAAAA9IeSL4RY%2FuHnHSfsC1GOrfIqljQ%3DNCeytls2bNK78J4jNfmEmvP2d190xs3gV0FCMs2CAYGRJmeS4j')
-
-#query = 'acoso -is:retweet'
-#tweets = client.search_recent_tweets(query=query, tweet_fields=['context_annotations', 'created_at'], max_results=10)
-
-#char_list = [tweets[j] for j in range(len(tweets)) if ord(tweets[j]) in range(65536)]
-#tweet=''
-#for j in char_list:
-#    tweet=tweet+j
-
 search_query = "#traficogt -filter:retweets"
 
 tweets = tweepy.Cursor(api.search_tweets,
@@ -247,4 +234,21 @@ for k in range(len(tweetsEnglish)):
     tweetsEnglish[k] = translator.translate(tweetsEmojiless[0][k]).text
     
     
-    #falta análisis de sentimientos(?)
+#falta análisis de sentimientos(?)
+sia = SentimentIntensityAnalyzer()
+
+sentimentValue = np.zeros(len(tweetsEnglish))
+for k in range(len(tweetsEnglish)):
+    sentimentValue[k] = sia.polarity_scores(tweetsEnglish[k]).get('compound')
+tweetsEmojiless.insert(loc=len(tweetsEmojiless.columns), column = 'sentimentValue', value = sentimentValue)
+
+
+# En promedio, el data set es un poco positivo.
+# La  media del sentimentValue del data set es 0.15. 
+print("Media de sentimiento: ", tweetsEmojiless['sentimentValue'].mean())
+
+# Top 10 tweets mas negativos segun sentimentValue.
+print(tweetsEmojiless.sort_values(by='sentimentValue').head(10)[0])
+
+# Top 10 tweets mas negativos segun sentimentValue.
+print(tweetsEmojiless.sort_values(by='sentimentValue', ascending=False).head(10)[0])
